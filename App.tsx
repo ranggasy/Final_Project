@@ -1,131 +1,92 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
+  View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+export default function App() {
+  const [task, setTask] = useState('');
+  const [taskList, setTaskList] = useState([]);
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+  useEffect(() => {
+    loadTasks();
+  }, []);
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+  useEffect(() => {
+    saveTasks();
+  }, [taskList]);
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const loadTasks = async () => {
+    const data = await AsyncStorage.getItem('tasks');
+    if (data) setTaskList(JSON.parse(data));
   };
 
-  /*
-   * To keep the template simple and small we're adding padding to prevent view
-   * from rendering under the System UI.
-   * For bigger apps the recommendation is to use `react-native-safe-area-context`:
-   * https://github.com/AppAndFlow/react-native-safe-area-context
-   *
-   * You can read more about it here:
-   * https://github.com/react-native-community/discussions-and-proposals/discussions/827
-   */
-  const safePadding = '5%';
+  const saveTasks = async () => {
+    await AsyncStorage.setItem('tasks', JSON.stringify(taskList));
+  };
+
+  const addTask = () => {
+    if (task.trim()) {
+      setTaskList([...taskList, { text: task, done: false }]);
+      setTask('');
+    }
+  };
+
+  const toggleDone = (index) => {
+    const updated = [...taskList];
+    updated[index].done = !updated[index].done;
+    setTaskList(updated);
+  };
+
+  const deleteTask = (index) => {
+    const updated = [...taskList];
+    updated.splice(index, 1);
+    setTaskList(updated);
+  };
 
   return (
-    <View style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <View style={styles.container}>
+      <Text style={styles.header}>📝 To-Do List</Text>
+      <View style={styles.inputRow}>
+        <TextInput
+          style={styles.input}
+          placeholder="Tulis tugas..."
+          value={task}
+          onChangeText={setTask}
+        />
+        <Button title="Tambah" onPress={addTask} />
+      </View>
+      <FlatList
+        data={taskList}
+        renderItem={({ item, index }) => (
+          <View style={styles.taskItem}>
+            <Text style={item.done ? styles.doneText : styles.normalText}>
+              {item.done ? '✔️' : '⬜'} {item.text}
+            </Text>
+            <View style={styles.buttonGroup}>
+              <Button title={item.done ? 'Batal' : 'Selesai'} onPress={() => toggleDone(index)} />
+              <Button title="Hapus" onPress={() => deleteTask(index)} />
+            </View>
+          </View>
+        )}
+        keyExtractor={(_, index) => index.toString()}
       />
-      <ScrollView
-        style={backgroundStyle}>
-        <View style={{paddingRight: safePadding}}>
-          <Header/>
-        </View>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            paddingHorizontal: safePadding,
-            paddingBottom: safePadding,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: { padding: 20, marginTop: 50 },
+  header: { fontSize: 24, marginBottom: 20, fontWeight: 'bold' },
+  inputRow: { flexDirection: 'row', gap: 10 },
+  input: {
+    borderWidth: 1, borderColor: '#ccc', padding: 10, flex: 1, borderRadius: 6,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  taskItem: {
+    marginVertical: 10, padding: 10, borderRadius: 6,
+    backgroundColor: '#f5f5f5',
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
+  buttonGroup: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 },
+  doneText: { textDecorationLine: 'line-through', color: 'green' },
+  normalText: { color: 'black' },
 });
-
-export default App;
