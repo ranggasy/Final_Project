@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity,
+  View, Text, TextInput, Button, FlatList, StyleSheet
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
   const [task, setTask] = useState('');
   const [taskList, setTaskList] = useState([]);
-
   useEffect(() => {
     loadTasks();
   }, []);
@@ -18,31 +17,32 @@ export default function App() {
 
   const loadTasks = async () => {
     const data = await AsyncStorage.getItem('tasks');
+    // console.log({data});
     if (data) setTaskList(JSON.parse(data));
-  };
+  }
 
   const saveTasks = async () => {
     await AsyncStorage.setItem('tasks', JSON.stringify(taskList));
-  };
+  }
 
   const addTask = () => {
     if (task.trim()) {
       setTaskList([...taskList, { text: task, done: false }]);
       setTask('');
     }
-  };
+  }
 
   const toggleDone = (index) => {
     const updated = [...taskList];
     updated[index].done = !updated[index].done;
     setTaskList(updated);
-  };
+  }
 
   const deleteTask = (index) => {
     const updated = [...taskList];
     updated.splice(index, 1);
     setTaskList(updated);
-  };
+  }
 
   return (
     <View style={styles.container}>
