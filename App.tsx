@@ -17,7 +17,7 @@ export default function App() {
 
   const loadTasks = async () => {
     const data = await AsyncStorage.getItem('tasks');
-    // console.log({data});
+    console.log({data});
     if (data) setTaskList(JSON.parse(data));
   }
 
@@ -32,13 +32,17 @@ export default function App() {
     }
   }
 
-  const toggleDone = (index) => {
+  const toggleDone = ({index}:{
+    index:number;
+  }) => {
     const updated = [...taskList];
     updated[index].done = !updated[index].done;
     setTaskList(updated);
   }
 
-  const deleteTask = (index) => {
+  const deleteTask = ({index}:{
+    index:number;
+  }) => {
     const updated = [...taskList];
     updated.splice(index, 1);
     setTaskList(updated);
@@ -64,8 +68,8 @@ export default function App() {
               {item.done ? '✔️' : '⬜'} {item.text}
             </Text>
             <View style={styles.buttonGroup}>
-              <Button title={item.done ? 'Batal' : 'Selesai'} onPress={() => toggleDone(index)} />
-              <Button title="Hapus" onPress={() => deleteTask(index)} />
+              <Button title={item.done ? 'Batal' : 'Selesai'} onPress={() => toggleDone({index: index})} />
+              <Button title="Hapus" onPress={() => deleteTask({index: index})} />
             </View>
           </View>
         )}
