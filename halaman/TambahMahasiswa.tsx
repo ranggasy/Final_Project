@@ -8,6 +8,26 @@ const TambahMahasiswa = () => {
     const [jurusan, setJurusan] = useState('');
     const [semester, setSemester] = useState('');
     const [dataMahasiswa, setDatamahasiswa] = useState([]);
+
+    const loadMahasiswa = async () => {
+        const data = await AsyncStorage.getItem('mahasiswa');
+        console.log('Data Mahasiswa:', 'Yang Tersimpan Di Memory');
+        console.log({ data });
+        if (data) setDatamahasiswa(JSON.parse(data));
+    }
+
+    useEffect(() => {
+        loadMahasiswa();
+    }, []);
+
+    useEffect(() => {
+        saveMahasiswa();
+    }, [dataMahasiswa]);
+
+    const saveMahasiswa = async () => {
+        console.log({ dataMahasiswa });
+        await AsyncStorage.setItem('mahasiswa', JSON.stringify(dataMahasiswa));
+    }
     useEffect(() => {
         console.log('Nama:', nama);
         console.log('NIM:', nim);
@@ -15,11 +35,25 @@ const TambahMahasiswa = () => {
         console.log('Semester:', semester);
     }, [nama, nim, jurusan, semester]);
 
-    const saveTasks = async () => {
-        try {
-            await AsyncStorage.setItem('tasks', JSON.stringify(dataMahasiswa));
-        } catch (error) {
-            console.error('Error saving tasks:', error);
+
+    const simpanDataMahasiswa = () => {
+        if (nama.trim() && nim.trim() && jurusan.trim() && semester.trim()) {
+            console.log({ nama, nim, jurusan, semester });
+            console.log('Data Mahasiswa:', 'DISIMPAN DALAM VARIABLE LIST dataMahasiswa');
+            setDatamahasiswa([
+                ...dataMahasiswa,
+                {
+                    nama: nama,
+                    nim: nim,
+                    jurusan: jurusan,
+                    semester: semester,
+                    done: false
+                }
+            ]);
+            setNama('');
+            setNim('');
+            setJurusan('');
+            setSemester('');
         }
     }
 
@@ -58,13 +92,7 @@ const TambahMahasiswa = () => {
                     onChangeText={setSemester}
                 />
             </View>
-            <Button title="Simpan Data" onPress={() => {
-                console.log('Data berhasil disimpan');
-                console.log('Nama:', nama);
-                console.log('NIM:', nim);
-                console.log('Jurusan:', jurusan);
-                console.log('Semester:', semester);
-            }} />
+            <Button title="Simpan Data" onPress={() => simpanDataMahasiswa()} />
         </View>
     )
 }

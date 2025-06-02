@@ -6,59 +6,57 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 export default function ListMahasiswa() {
   const navigation = useNavigation();
-  const [task, setTask] = useState('');
-  const [taskList, setTaskList] = useState([]);
+  const [datamahasiswa, setDatamahasiswa] = useState([]);
   useEffect(() => {
     loadTasks();
   }, []);
 
   useEffect(() => {
     saveTasks();
-  }, [taskList]);
+  }, [datamahasiswa]);
 
   const loadTasks = async () => {
-    const data = await AsyncStorage.getItem('tasks');
+    const data = await AsyncStorage.getItem('mahasiswa');
     console.log({data});
-    if (data) setTaskList(JSON.parse(data));
+    if (data) setDatamahasiswa(JSON.parse(data));
   }
 
   const saveTasks = async () => {
-    console.log({taskList});
-    await AsyncStorage.setItem('tasks', JSON.stringify(taskList));
+    console.log({datamahasiswa});
+    await AsyncStorage.setItem('mahasiswa', JSON.stringify(datamahasiswa));
   }
 
 
   const toggleDone = ({index}:{
     index:number;
   }) => {
-    const updated = [...taskList];
+    const updated = [...datamahasiswa];
     updated[index].done = !updated[index].done;
-    setTaskList(updated);
+    setDatamahasiswa(updated);
   }
 
   const deleteTask = ({index}:{
     index:number;
   }) => {
-    const updated = [...taskList];
+    const updated = [...datamahasiswa];
     updated.splice(index, 1);
-    setTaskList(updated);
+    setDatamahasiswa(updated);
   }
 
   return (
     <View style={styles.container}>
-        <Button title="Tambah Mahasiswa" onPress={ ()=> navigation.navigate('Tambah')}/>
+        <View style={styles.buttonRow}>
+          <Button title="Refresh" onPress={ loadTasks } color={`red`}/>
+          <Button title="Tambah Mahasiswa" onPress={ ()=> navigation.navigate('Tambah')}/>
+        </View>
       <FlatList
-        data={taskList}
+        data={datamahasiswa}
         renderItem={({ item, index }) => (
-          <View style={styles.taskItem}>
-            <Text style={item.done ? styles.doneText : styles.normalText}>
-              {item.done ? '✔️' : '⬜'} {item.text}
-            </Text>
-            <View style={styles.buttonGroup}>
-              <Button title={item.done ? 'Batal' : 'Selesai'} onPress={() => toggleDone({index: index})} />
-              <Button title="Hapus" onPress={() => deleteTask({index: index})} />
-            </View>
-          </View>
+          <CardListItem 
+            dataitem={item} 
+            onStatusChange={()=> toggleDone({index: index})}
+            onDelete={()=> deleteTask({index: index})}
+          />
         )}
         keyExtractor={(_, index) => index.toString()}
       />
@@ -66,10 +64,56 @@ export default function ListMahasiswa() {
   );
 }
 
+
+const CardListItem = ({dataitem,  onStatusChange, onDelete} : {
+  dataitem:{
+    nama:string;
+    nim:string;
+    jurusan:string;
+    semester:string;
+    done:boolean;
+  },
+  onStatusChange: () => void,
+  onDelete: () => void,
+}) => {
+  return (
+    <View style={{
+      marginVertical: 10, 
+      padding: 10, 
+      borderRadius: 6,
+      backgroundColor: dataitem.done ? 'green' : 'grey',
+    }}>
+      <View>
+        <Text style={dataitem.done ? styles.doneText : styles.normalText}>
+          {dataitem.done ? '✔️' : '⬜'}
+        </Text>
+        <View style={{
+          marginVertical: 10,
+          padding: 10,
+          marginLeft: 16,
+          borderRadius: 6,
+          backgroundColor: 'white',
+        }}>
+         <Text>Nama : {dataitem.nama}</Text>
+         <Text>Nim : {dataitem.nim}</Text> 
+         <Text>Jurusan : {dataitem.jurusan}</Text>  
+         <Text>Semester : {dataitem.semester}</Text>
+        </View>
+      </View>
+        
+        <View style={styles.buttonGroup}>
+          <Button title={dataitem.done ? 'Batal' : 'Selesai'} onPress={onStatusChange} />
+          <Button title="Hapus" onPress={onDelete} />
+        </View>
+      </View>
+  )
+}
+
 const styles = StyleSheet.create({
-  container: { padding: 20, marginTop: 50 },
+  container: { padding: 20, marginTop: 12 },
   header: { fontSize: 24, marginBottom: 20, fontWeight: 'bold' },
   inputRow: { flexDirection: 'row', gap: 10 },
+  buttonRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 },
   input: {
     borderWidth: 1, borderColor: '#ccc', padding: 10, flex: 1, borderRadius: 6,
   },
