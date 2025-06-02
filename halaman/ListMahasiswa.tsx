@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, TextInput, Button, FlatList, StyleSheet
+  View, Text, Button, FlatList, StyleSheet
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-export default function App() {
+import { useNavigation } from '@react-navigation/native';
+export default function ListMahasiswa() {
+  const navigation = useNavigation();
   const [task, setTask] = useState('');
   const [taskList, setTaskList] = useState([]);
   useEffect(() => {
@@ -22,15 +23,10 @@ export default function App() {
   }
 
   const saveTasks = async () => {
+    console.log({taskList});
     await AsyncStorage.setItem('tasks', JSON.stringify(taskList));
   }
 
-  const addTask = () => {
-    if (task.trim()) {
-      setTaskList([...taskList, { text: task, done: false }]);
-      setTask('');
-    }
-  }
 
   const toggleDone = ({index}:{
     index:number;
@@ -50,16 +46,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>📝 To-Do List</Text>
-      <View style={styles.inputRow}>
-        <TextInput
-          style={styles.input}
-          placeholder="Tulis tugas..."
-          value={task}
-          onChangeText={setTask}
-        />
-        <Button title="Tambah" onPress={addTask} />
-      </View>
+        <Button title="Tambah Mahasiswa" onPress={ ()=> navigation.navigate('Tambah')}/>
       <FlatList
         data={taskList}
         renderItem={({ item, index }) => (
