@@ -56,6 +56,16 @@ export default function ListMahasiswa() {
             dataitem={item} 
             onStatusChange={()=> toggleDone({index: index})}
             onDelete={()=> deleteTask({index: index})}
+            pindahHalaman={()=> navigation.navigate('Edit', {
+              data: {
+                nma: item.nama,
+                nim: item.nim,
+                jurusan: item.jurusan,
+                semester: item.semester,
+                done: item.done,
+              },
+              index: index,
+            })}
           />
         )}
         keyExtractor={(_, index) => index.toString()}
@@ -65,7 +75,7 @@ export default function ListMahasiswa() {
 }
 
 
-const CardListItem = ({dataitem,  onStatusChange, onDelete} : {
+const CardListItem = ({dataitem,  onStatusChange, onDelete, pindahHalaman} : {
   dataitem:{
     nama:string;
     nim:string;
@@ -75,6 +85,7 @@ const CardListItem = ({dataitem,  onStatusChange, onDelete} : {
   },
   onStatusChange: () => void,
   onDelete: () => void,
+  pindahHalaman: () => void, // Tambahkan parameter ini untuk fungsi pindah halaman edit dat
 }) => {
   return (
     <View style={{
@@ -103,6 +114,7 @@ const CardListItem = ({dataitem,  onStatusChange, onDelete} : {
         
         <View style={styles.buttonGroup}>
           <Button title={dataitem.done ? 'Batal' : 'Selesai'} onPress={onStatusChange} />
+          <Button title="Edit" onPress={pindahHalaman} />
           <Button title="Hapus" onPress={onDelete} />
         </View>
       </View>
