@@ -1,5 +1,5 @@
 <<<<<<< HEAD
-# PROJECT FOR HIMPTI MINI BOOTCAMP ISB ATMA LUHUR 2025
+# PROJECT FOR HIMTI MINI BOOTCAMP ISB ATMA LUHUR 2025
 ## Mobile Apps Using React Native
 ### Installation
 1. Clone this repository
