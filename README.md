@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # PROJECT FOR HIMPTI MINI BOOTCAMP ISB ATMA LUHUR 2025
 ## Mobile Apps Using React Native
 ### Installation
@@ -10,3 +11,7 @@
 Notes : 
 1. If You Want To Changes Main Code It's In Application.tsx ad Landing or Initial Sources Code.
 2. Use React-native Bare-bone Not Expo.
+=======
+# Final_Project_Minibootcamp
+Ini adalah final project react native kami
+>>>>>>> 43106da1953cbf369e631e06cfe073faf3c95040
